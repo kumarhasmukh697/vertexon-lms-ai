@@ -1,7 +1,8 @@
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Category, Course
-from .serializers import CategorySerializer, CourseSerializer
+from .serializers import CategorySerializer, CourseSerializer, CourseApprovalSerializer
+from rest_framework.exceptions import ValidationError
 from accounts.permissions import ( IsAdmin, IsInstructorOrAdmin, IsCourseOwnerOrAdmin,)
 
 # Create your views here.
@@ -61,3 +62,20 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
             return [IsAuthenticated(), IsCourseOwnerOrAdmin()]
 
         return [AllowAny()]
+
+
+
+
+
+
+
+
+
+
+
+
+class CourseApprovalView(generics.UpdateAPIView):
+    queryset = Course.objects.all()
+    serializer_class = CourseApprovalSerializer
+    permission_classes = [IsAdmin]
+    http_method_names = ['patch', 'options', 'head']
