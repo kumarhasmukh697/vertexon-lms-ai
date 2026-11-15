@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Course
+from .models import Category, Course, Module, Lecture
 
 
 
@@ -47,3 +47,29 @@ class CourseApprovalSerializer(serializers.ModelSerializer):
                 "Status must be approved or rejected."
             )
         return value
+
+
+
+
+
+
+
+
+
+class ModuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Module
+        fields = [ 'id', 'course', 'title', 'description', 'order', 'created_at',]
+        read_only_fields = ['id', 'course', 'created_at']
+
+
+
+
+
+
+class LectureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lecture
+        fields = [ 'id', 'module', 'title', 'description', 'video','pdf_material','transcript','duration_seconds','order','is_preview', 'created_at',]
+        read_only_fields = [ 'id', 'module', 'created_at',]
+
