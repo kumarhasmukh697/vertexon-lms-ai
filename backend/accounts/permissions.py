@@ -58,3 +58,15 @@ class IsInstructorOrAdmin(BasePermission):
                 or request.user.is_superuser
             )
         )
+
+
+
+
+class IsCourseOwnerOrAdmin(BasePermission):
+    def has_object_permission(self, request, view, obj):
+
+        if request.user.is_superuser or request.user.role == 'admin':
+            return True
+
+        return obj.instructor == request.user
+
