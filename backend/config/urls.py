@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/v1/courses/', include('courses.urls')),
     path('api/v1/', include('enrollments.urls')),
     path('api/v1/', include('quizzes.urls')),
+    path('api/v1/', include('assignments.urls')),
 ] 
 if settings.DEBUG:
      urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
