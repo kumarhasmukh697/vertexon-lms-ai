@@ -5,6 +5,9 @@ from django.db import transaction
 from django.db.models import Prefetch
 from django.utils import timezone
 
+from notifications.services import create_notification
+from notifications.models import Notification
+
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -294,6 +297,20 @@ class SubmitQuizAttemptView(APIView):
         attempt.submitted_at = timezone.now()
 
         attempt.save()
+
+
+        create_notification(
+            recipient=attempt.student,
+            title="Quiz Result Available",
+            message=(
+                f"You completed '{attempt.quiz.title}'. "
+                f"Your score is {attempt.score}/"
+                f"{attempt.total_marks} "
+                f"({attempt.percentage}%)."
+            ),
+            notification_type=Notification.NotificationType.QUIZ,
+            link="/student/quizzes/"
+        )
 
         return Response( QuizAttemptSerializer(attempt).data, status=status.HTTP_200_OK)
 

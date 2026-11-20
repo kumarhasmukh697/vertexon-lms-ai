@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db import transaction
+from notifications.services import create_notification
+from notifications.models import Notification
 
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
@@ -245,6 +247,20 @@ class GradeSubmissionView(APIView):
             raise ValidationError("Marks are required to grade a submission.")
 
         submission = serializer.save( status=Submission.Status.GRADED, graded_at=timezone.now())
+
+
+        create_notification(
+            recipient=submission.student,
+            title="Assignment Graded",
+            message=(
+                f"Your assignment '{submission.assignment.title}' "
+                f"has been evaluated. You received "
+                f"{submission.marks_obtained}/"
+                f"{submission.assignment.max_marks} marks."
+            ),
+            notification_type=Notification.NotificationType.GRADE,
+            link="/student/assignments/"
+       )
 
         return Response( SubmissionInstructorSerializer(submission).data, status=status.HTTP_200_OK )
 
