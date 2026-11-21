@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'quizzes',
     'assignments',
     'notifications',
+    'gamification',
 
 ]
 

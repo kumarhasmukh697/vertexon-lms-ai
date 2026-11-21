@@ -12,6 +12,10 @@ from courses.models import Course, Lecture
 from .models import Enrollment, LectureProgress
 from .serializers import ( EnrollmentSerializer, LectureProgressSerializer,)
 
+from gamification.services import ( award_points, update_learning_streak,)
+
+from gamification.models import PointTransaction
+
 
 
 
@@ -100,6 +104,17 @@ class LectureProgressView(APIView):
             progress.completed_at = ( timezone.now() if new_is_completed else None)
 
             progress.save()
+
+        if progress.is_completed:
+            award_points(
+                student=request.user,
+                activity_type=PointTransaction.ActivityType.LECTURE,
+                points=10,
+                description=f"Completed lecture: {lecture.title}",
+                source_id=lecture.id
+            )
+
+            update_learning_streak(request.user)
 
         # Update the overall enrollment status.
         total_lectures = Lecture.objects.filter( module__course=lecture.module.course).count()

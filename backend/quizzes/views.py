@@ -22,6 +22,10 @@ from .models import ( Quiz, Question, Option, QuizAttempt, StudentAnswer,)
 from .serializers import (QuizInstructorSerializer, QuizStudentSerializer, QuestionInstructorSerializer, QuestionStudentSerializer, QuizAttemptSerializer,)
 
 
+from gamification.services import ( award_points, update_learning_streak,)
+from gamification.models import PointTransaction
+
+
 
 def is_admin(user):
     return user.is_authenticated and ( user.is_superuser or user.role == 'admin')
@@ -297,6 +301,17 @@ class SubmitQuizAttemptView(APIView):
         attempt.submitted_at = timezone.now()
 
         attempt.save()
+
+
+        award_points(
+            student=attempt.student,
+            activity_type=PointTransaction.ActivityType.QUIZ,
+            points=20,
+            description=f"Completed quiz: {attempt.quiz.title}",
+            source_id=attempt.id
+        )
+
+        update_learning_streak(attempt.student)
 
 
         create_notification(

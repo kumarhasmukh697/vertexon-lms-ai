@@ -17,6 +17,12 @@ from .models import Assignment, Submission
 
 from .serializers import ( AssignmentInstructorSerializer, AssignmentStudentSerializer, SubmissionCreateSerializer, SubmissionGradingSerializer, SubmissionInstructorSerializer, StudentSubmissionResultSerializer,)
 
+from gamification.services import (
+    award_points, update_learning_streak,
+)
+
+from gamification.models import PointTransaction
+
 
 
 
@@ -185,6 +191,17 @@ class AssignmentSubmissionView(APIView):
         submission.submitted_at = timezone.now()
 
         submission.save()
+
+
+        award_points(
+            student=request.user,
+            activity_type=PointTransaction.ActivityType.ASSIGNMENT,
+            points=15,
+            description=f"Submitted assignment: {assignment.title}",
+            source_id=submission.id
+        )
+
+        update_learning_streak(request.user)
 
         return Response(
             SubmissionCreateSerializer(submission).data,
