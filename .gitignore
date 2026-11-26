@@ -28,3 +28,7 @@ htmlcov/
 .idea/
 .DS_Store
 Thumbs.db
+
+# add the chroma_data
+chroma_data/
+test_chroma.py
